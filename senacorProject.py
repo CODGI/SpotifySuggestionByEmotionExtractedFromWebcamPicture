@@ -31,12 +31,12 @@ mainloop()
 
 # Get picture
 cam = cv2.VideoCapture(0)
-cv2.namedWindow("test")
+cv2.namedWindow("Look into the camera")
 ret, frame = cam.read()
-cv2.imwrite("test.jpg", frame)
+cv2.imwrite("picture.jpg", frame)
 
 # Use Google Cloud Vision API to get most dominant emotion
-image_file_name = 'test.jpg'
+image_file_name = 'picture.jpg'
 client = vision.ImageAnnotatorClient()
 
 with io.open(image_file_name, 'rb') as image_file:
@@ -54,7 +54,6 @@ for face in faces:
     dominant_emotion = sorted([(face.sorrow_likelihood, 'sorrow'), (face.joy_likelihood, 'joy'),
                                (face.anger_likelihood, 'anger')], key=lambda x: x[0])[2]
 
-
 # Connect to Spotify API
 scope = 'user-top-read'
 clientCredentialsFile = open("spotifyClientCredentials.txt", "r")
@@ -68,15 +67,15 @@ for line in clientCredentialsFile:
 
 try:
     token = util.prompt_for_user_token(username=username, client_id=str(client_id),
-                                       client_secret= str(client_secret),
+                                       client_secret=str(client_secret),
                                        redirect_uri="http://localhost/", scope=scope)
 except (AttributeError, JSONDecodeError):
     os.remove(f".cache-{username}")
-    token = util.prompt_for_user_token(username=username, client_id= str(client_id),
+    token = util.prompt_for_user_token(username=username, client_id=str(client_id),
                                        client_secret=str(client_secret),
                                        redirect_uri="http://localhost/", scope=scope)
 
-client_credentials_manager = SpotifyClientCredentials(client_id= str(client_id),
+client_credentials_manager = SpotifyClientCredentials(client_id=str(client_id),
                                                       client_secret=str(client_secret))
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager, auth=token)
 sp.trace = False
@@ -87,8 +86,8 @@ metal = sp.category_playlists(category_id='metal')
 
 playlists = list()
 
-mappings = {'joy': ['Sommergefühle', 'Happy Dance', 'Feelin\' Good'],
-            'anger': ['Kickass Metal', 'Old School Metal', 'Deathcore'],
+mappings = {'joy': ['Sommergefühle', 'Happy Dance'],
+            'anger': ['Kickass Metal', 'New Blood', 'Deathcore'],
             'sorrow': ['Life Sucks', 'Acoustic Covers', 'Alone Again']}
 
 
